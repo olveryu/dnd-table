@@ -1,0 +1,46 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+body {
+  margin: 0;
+  padding: 12px;
+  background: #fafaf9;
+  color: #1c1917;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1c1917;
+    color: #fafaf9;
+  }
+}
+button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #a8a29e;
+  background: #fff;
+  color: #1c1917;
+  cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+  button {
+    background: #292524;
+    color: #fafaf9;
+    border-color: #57534e;
+  }
+}
+button.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tab-content {
+  max-width: 900px;
+}
