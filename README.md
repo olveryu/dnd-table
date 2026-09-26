@@ -25,7 +25,7 @@ src/
   data/
     characters/ 人物数据（阿什）
     monsters/   怪物库（TODO 二期）
-    rules/      SRD 5.2.1 规则库（TODO 二期）
+    rules/      SRD 5.2.1 规则库（技能 18 / 状态 16 / 法术 339 / 法师特性，已导入）
     campaign/   战役日志（TODO 二期）
 ```
 
