@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ASH, abilityMod, formatMod } from '../data/characters';
+import { setAshHp, useAshHp } from '../state/party';
 import {
   SKILLS, WIZARD_FEATURES, allRules,
   type RuleEntry,
@@ -44,6 +45,7 @@ function ruleById(id: string): RuleEntry | undefined {
 export default function CharacterSheet() {
   const c = ASH;
   const [sel, setSel] = useState<RuleEntry | null>(null);
+  const ashHp = useAshHp();
 
   const skillMod = (skillId: string, ability: string) => {
     const base = abilityMod(c.abilities[ABILITY_KEY[ability]]);
@@ -83,7 +85,10 @@ export default function CharacterSheet() {
       </div>
 
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14, marginBottom: 12 }}>
-        <span>❤️ HP <strong>{c.hp}/{c.maxHp}</strong></span>
+        <span>❤️ HP <strong>{ashHp.hp}/{ashHp.maxHp}</strong>{' '}
+          <button onClick={() => setAshHp(ashHp.hp - 1)} style={{ fontSize: 12 }} aria-label="HP-1">−</button>{' '}
+          <button onClick={() => setAshHp(ashHp.hp + 1)} style={{ fontSize: 12 }} aria-label="HP+1">＋</button>
+        </span>
         <span>🛡 AC <strong>{c.ac}</strong></span>
         <span>👟 速度 <strong>{c.speed} 尺</strong></span>
         <span>✨ 法术攻击 <strong>{formatMod(c.spellAttack)}</strong> · DC <strong>{c.spellDC}</strong></span>

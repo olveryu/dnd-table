@@ -1,16 +1,50 @@
 import { useState } from 'react';
 
-// 公开骰子：点骰即掷，修正 + 优势/劣势，结果公开记录
+// 公开骰子：点骰即掷，修正 + 优势/劣势，结果公开记录（localStorage 持久化）
 const DICE = [20, 12, 10, 8, 6, 4, 100];
+const LOG_KEY = 'dnd-table:dice-log';
+const LOG_MAX = 30;
 
 function fmtMod(m: number): string {
   return (m >= 0 ? '+' : '') + m;
 }
 
+function loadLog(): string[] {
+  try {
+    const raw = localStorage.getItem(LOG_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr)
+      ? arr.filter((x) => typeof x === 'string').slice(0, LOG_MAX)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function DiceRoller() {
   const [mod, setMod] = useState(0);
   const [adv, setAdv] = useState(0); // 0 普通 1 优势 2 劣势
-  const [log, setLog] = useState<string[]>([]);
+  const [log, setLog] = useState<string[]>(loadLog);
+
+  const saveLog = (next: string[]) => {
+    const capped = next.slice(0, LOG_MAX);
+    try {
+      localStorage.setItem(LOG_KEY, JSON.stringify(capped));
+    } catch {
+      /* 存储满了就忽略 */
+    }
+    setLog(capped);
+  };
+
+  const clearLog = () => {
+    try {
+      localStorage.removeItem(LOG_KEY);
+    } catch {
+      /* 忽略 */
+    }
+    setLog([]);
+  };
 
   const roll = (d: number) => {
     let r: number;
@@ -26,7 +60,7 @@ export default function DiceRoller() {
     }
     const total = r + mod;
     const crit = d === 20 && r === 20 ? ' 💥大成功' : d === 20 && r === 1 ? ' 🕳大失败' : '';
-    setLog((prev) => [`${detail}${fmtMod(mod)} = ${total}${crit}`, ...prev].slice(0, 30));
+    saveLog([`${detail}${fmtMod(mod)} = ${total}${crit}`, ...log]);
   };
 
   return (
@@ -44,7 +78,7 @@ export default function DiceRoller() {
         <strong>{fmtMod(mod)}</strong>
         <button onClick={() => setMod(mod + 1)}>＋</button>
         <button onClick={() => setAdv((adv + 1) % 3)}>{['普通', '优势', '劣势'][adv]}</button>
-        <button style={{ marginLeft: 'auto' }} onClick={() => setLog([])}>清空记录</button>
+        <button style={{ marginLeft: 'auto' }} onClick={clearLog}>清空记录</button>
       </div>
       <div style={{ fontSize: 14, maxHeight: 220, overflowY: 'auto', borderTop: '1px solid #a8a29e', paddingTop: 6 }}>
         {log.length ? (

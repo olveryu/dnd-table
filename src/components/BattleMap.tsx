@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { setAshHp, resetAshHp, useAshHp } from '../state/party';
 
 // ---------- 类型 ----------
 export interface Token {
@@ -72,6 +73,12 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cellRef = useRef(40);
 
+  // 阿什 token 的 HP 订阅外部 store（与人物卡双向同步）；其他 token 用本地 state
+  const ashHp = useAshHp();
+  const tokens: Token[] = s.tokens.map((t) =>
+    t.id === 'ash' ? { ...t, hp: ashHp.hp, maxHp: ashHp.maxHp } : t
+  );
+
   // ---------- 工具函数 ----------
   const tokAt = (x: number, y: number, tokens: Token[]): Token | undefined =>
     tokens.find((t) => t.x === x && t.y === y);
@@ -99,7 +106,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
         const nx = x + dx;
         const ny = y + dy;
         if (blocked(nx, ny)) continue;
-        const o = tokAt(nx, ny, s.tokens);
+        const o = tokAt(nx, ny, tokens);
         if (o && o.id !== tok.id) continue;
         const nd = d + moveCost(nx, ny);
         const k = nx + ',' + ny;
@@ -185,7 +192,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
 
     // token
     const activeId = s.order[s.turnIndex % s.order.length];
-    for (const t of s.tokens) {
+    for (const t of tokens) {
       const px = OX + t.x * cell;
       const py = OY + t.y * cell;
       const r = cell * 0.38;
@@ -226,7 +233,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
     '先攻：' +
     s.order
       .map((id, i) => {
-        const t = s.tokens.find((x) => x.id === id);
+        const t = tokens.find((x) => x.id === id);
         return (i === s.turnIndex % s.order.length ? '▶ ' : '') + (t ? t.name : id);
       })
       .join(' → ');
@@ -256,7 +263,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
       return;
     }
 
-    const t = tokAt(x, y, s.tokens);
+    const t = tokAt(x, y, tokens);
     if (sel && reach[x + ',' + y] !== undefined && !(sel.x === x && sel.y === y)) {
       const from = cellName(sel.x, sel.y);
       const cost = reach[x + ',' + y] * 5;
@@ -283,6 +290,10 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
 
   const adjustHp = (delta: number) => {
     if (!sel) return;
+    if (sel.id === 'ash') {
+      setAshHp(ashHp.hp + delta); // 写回 store → 人物卡同步
+      return;
+    }
     setS((prev) => ({
       ...prev,
       tokens: prev.tokens.map((t) =>
@@ -296,6 +307,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
 
   const reset = () => {
     setS(structuredClone(initial));
+    resetAshHp();
     setSel(null);
     setReach({});
     setRulerMode(false);
@@ -303,7 +315,7 @@ export default function BattleMap({ initial = DEMO_STATE, title = '战斗地图 
     setInfo('已重置。');
   };
 
-  const selLive = sel ? s.tokens.find((t) => t.id === sel.id) ?? null : null;
+  const selLive = sel ? tokens.find((t) => t.id === sel.id) ?? null : null;
 
   return (
     <div>

@@ -2,6 +2,8 @@
 // This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.
 // Text modified/reformatted for app use (CC-BY-4.0 section 3(a)(1)(B)).
 
+import { SPELL_CN } from "./spellCn";
+
 export interface Spell {
   id: string;
   name: string;
@@ -4427,3 +4429,8 @@ export const SPELLS: Spell[] = [
 ];
 
 export const SPELL_COUNT = 339;
+
+// Fill in Chinese names from spellCn.ts without touching existing translations.
+for (const s of SPELLS) {
+  if (!s.cnName && SPELL_CN[s.id]) s.cnName = SPELL_CN[s.id];
+}

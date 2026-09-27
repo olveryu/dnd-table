@@ -13,9 +13,17 @@ npm run dev
 
 ## 功能（MVP）
 
-- 🗺 **战斗地图**：网格、token 点选移动（速度校验、困难地形）、量尺、先攻条、HP 条
-- 🎲 **骰子**：公开掷骰 log，修正 + 优势/劣势
-- 🧙 **人物卡**：阿什完整卡展示
+- 🗺 **战斗地图**：网格、token 点选移动（速度校验、困难地形）、量尺、先攻条、HP 条（阿什 HP 与人物卡双向同步）
+- 🎲 **骰子**：公开掷骰 log（localStorage 持久化），修正 + 优势/劣势
+- 🧙 **人物卡**：阿什完整卡展示，技能/法术/特性点击查 SRD 原文
+- 📖 **规则库**：SRD 5.2.1 全文搜索（18 技能 / 16 状态 / 339 法术全中文名 / 法师特性）
+- 👹 **怪物**：330 个 SRD 怪物 stat block，中英双语搜索
+
+## 部署
+
+线上：https://olveryu.github.io/dnd-table/（从 gh-pages 分支读取）。
+
+目前手动部署：`npm run build` 后把 dist 推到 gh-pages。`.github/workflows/deploy.yml`（push main 自动构建部署）已写好，暂存在 `ci/auto-deploy` 分支——因当前 gh token 缺 `workflow` 授权推不进 main，跑 `gh auth refresh -s workflow` 授权后即可合并启用。
 
 ## 目录
 
@@ -24,7 +32,7 @@ src/
   components/   BattleMap / DiceRoller / CharacterSheet
   data/
     characters/ 人物数据（阿什）
-    monsters/   怪物库（TODO 二期）
+    monsters/   怪物库（SRD 5.2.1，330 个，已导入）
     rules/      SRD 5.2.1 规则库（技能 18 / 状态 16 / 法术 339 / 法师特性，已导入）
     campaign/   战役日志（TODO 二期）
 ```
